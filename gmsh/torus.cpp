@@ -12,10 +12,10 @@ int main(int argc, char const *argv[]) {
   gmsh::initialize();
   gmsh::model::add("torus");
 
-  double lc = 1e-1;
+  double lc = 1;
   double R = 5;
   double r = 2;
-  double r0 = 1.5;
+  double r0 = 1;
   int count = 0;
   int dim = 10;
 
@@ -90,8 +90,9 @@ int main(int argc, char const *argv[]) {
   }
   v.clear();
   for(int i = 1 + 8*dim*dim; i < 4*dim*dim + 1 + 8*dim*dim; i++)
-    v.push_back(-i);
+    v.push_back(i);
   gmsh::model::geo::addSurfaceLoop({v}, 2);
+
   gmsh::model::geo::addVolume({1, 2}, 1);
 
   gmsh::model::geo::synchronize();
