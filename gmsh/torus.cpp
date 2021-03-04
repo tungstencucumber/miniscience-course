@@ -12,12 +12,12 @@ int main(int argc, char const *argv[]) {
   gmsh::initialize();
   gmsh::model::add("torus");
 
-  double lc = 1;
+  double lc = 5e-1;
   double R = 5;
   double r = 2;
   double r0 = 1;
   int count = 0;
-  int dim = 10;
+  int dim = 15;
 
   // Outer Ring
   // creating points
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[]) {
   for(int i = 0; i < 2*dim; i++) {
       for(int j = 0; j < 2*dim; j++) {
           gmsh::model::geo::addCurveLoop({(j + 2*dim*i)%(4*dim*dim) + 1 + 8*dim*dim, (i + 2*dim*(j + 1))%(4*dim*dim) + 1 + 4*dim*dim + 8*dim*dim, -((j + 2*dim*(i + 1))%(4*dim*dim) + 1 + 8*dim*dim), -((i + 2*dim*j)%(4*dim*dim) + 1 + 4*dim*dim + 8*dim*dim)}, j + 2*dim*i + 1 + 8*dim*dim);
-          gmsh::model::geo::addPlaneSurface({j + 2*dim*i + 1}, j + 2*dim*i + 1 + 8*dim*dim);
+          gmsh::model::geo::addPlaneSurface({j + 2*dim*i + 1 + 8*dim*dim}, j + 2*dim*i + 1 + 8*dim*dim);
       }
   }
   v.clear();
