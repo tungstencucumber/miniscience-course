@@ -64,10 +64,10 @@ public:
       double X = STLNodesCoords[i];
       double Y = STLNodesCoords[i + 1];
       double Z = STLNodesCoords[i + 2];
-      double VX = 0.;
-      double VY = 0.;
-      double VZ = 0.;
-      double DENSITY = 0; // тут будет распределение, но попозже
+      double VX = 0.0;
+      double VY = sin(Y);
+      double VZ = 0.0;
+      double DENSITY = exp(-X); // тут будет распределение, но попозже
       MeshNodes[i] = CalculableNode(X, Y, Z, VX, VY, VZ, DENSITY);
     }
 
@@ -155,7 +155,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // Извлекаем геометрию объекта из STL-ины
-  double angle = 1;
+  double angle = 50;
   bool forceParametrizablePatches = false;
   bool includeBoundary = true;
   double curveAngle = 180;

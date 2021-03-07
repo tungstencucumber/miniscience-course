@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
 
-  double angle = 40;
+  double angle = 50;
   bool forceParametrizablePatches = false;
   bool includeBoundary = true;
   double curveAngle = 180;
