@@ -21,18 +21,25 @@ friend class CalculableMesh;
 protected:
   double x, y, z; // координаты точки
   double vx, vy, vz; // скорость точки
+  double omega; // угловая скорость точки
   double density; // плотность жидкости известного рода в данной точке, г/см^3
 public:
   // конструктор по умолчанию
-  CalculableNode() : x(0.0), y(0.0), z(0.0), vx(0.0), vy(0.0), vz(0.0), density(0.0)
+  CalculableNode() : x(0.0), y(0.0), z(0.0), vx(0.0), vy(0.0), vz(0.0), omega(0.), density(0.0)
   {}
 
   // нормальный конструктор со всеми параметрами
-  CalculableNode(double x, double y, double z, double vx, double vy, double vz, double smth)
-      : x(x), y(y), z(z), vx(vx), vy(vy), vz(vz), density(density)
+  CalculableNode(double x, double y, double z, double vx, double vy, double vz, double omega, double density)
+      : x(x), y(y), z(z), vx(vx), vy(vy), vz(vz), omega(omega), density(density)
   {}
 
-  void move(double tau) // Метод перемещения точки за время tau с текущей скоростью
+  void Accelerate(double tau) // Метод изменения скорости тела при вращательном движении
+  {
+    vx += -omega*omega*x*tau;
+    vy += -omega*omega*y*tau;
+  }
+
+  void Move(double tau) // Метод перемещения точки за время tau с текущей скоростью
   {
     x += vx * tau;
     y += vy * tau;
@@ -61,14 +68,15 @@ public:
     MeshNodes.resize(STLNodesCoords.size() / 3);
     for(unsigned int i = 0; i < STLNodesCoords.size() / 3; ++i)
     {
-      double X = STLNodesCoords[i];
-      double Y = STLNodesCoords[i + 1];
-      double Z = STLNodesCoords[i + 2];
-      double VX = 0.0;
-      double VY = sin(Y);
+      double X = STLNodesCoords[i*3];
+      double Y = STLNodesCoords[i*3 + 1];
+      double Z = STLNodesCoords[i*3 + 2];
+      double OMEGA = 1;
+      double VX = -OMEGA*Y;
+      double VY = OMEGA*X;
       double VZ = 0.0;
-      double DENSITY = exp(-X); // тут будет распределение, но попозже
-      MeshNodes[i] = CalculableNode(X, Y, Z, VX, VY, VZ, DENSITY);
+      double DENSITY = Y; // тут будет распределение, но попозже
+      MeshNodes[i] = CalculableNode(X, Y, Z, VX, VY, VZ, OMEGA, DENSITY);
     }
 
     // загружаем в сеточку элементы STL-ной модели
@@ -87,7 +95,11 @@ public:
   {
     for(unsigned int i = 0; i < MeshNodes.size(); ++i)
     {
-      MeshNodes[i].move(tau);
+      MeshNodes[i].Move(tau);
+    }
+    for(unsigned int i = 0; i < MeshNodes.size(); ++i)
+    {
+      MeshNodes[i].Accelerate(tau);
     }
   }
 
@@ -126,11 +138,12 @@ public:
     {
       auto Tetra = vtkSmartPointer<vtkTetra>::New();
       for(unsigned int j = 0; j < 4; ++j)
-        Tetra->GetPointIds()->SetId(j, MeshElements[i].NodesIDs[j]);
+        Tetra->GetPointIds()->SetId( j, MeshElements[i].NodesIDs[j] );
+      UnstructuredGrid->InsertNextCell(Tetra->GetCellType(), Tetra->GetPointIds());
     }
 
     // таки сохраним полученную сетку в снапшот
-    std::string FileName = "wine-step" + std::to_string(SnapNumber) + ".vtu";
+    std::string FileName = "wine-step-" + std::to_string(SnapNumber) + ".vtu";
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> Writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     Writer->SetFileName(FileName.c_str());
     Writer->SetInputData(UnstructuredGrid);
@@ -155,7 +168,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // Извлекаем геометрию объекта из STL-ины
-  double angle = 50;
+  double angle = 40;
   bool forceParametrizablePatches = false;
   bool includeBoundary = true;
   double curveAngle = 180;
@@ -219,6 +232,12 @@ int main(int argc, char const *argv[]) {
   gmsh::finalize();
 
   MyMesh.Snapshot(0);
+
+  for(unsigned int i = 1; i < floor(1/tau); ++i)
+  {
+    MyMesh.DoTimeStep(tau);
+    MyMesh.Snapshot(i);
+  }
 
   return 0;
 }
