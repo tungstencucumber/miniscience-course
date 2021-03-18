@@ -9,7 +9,7 @@ rho = 1            # density
 
 # Create mesh
 channel = Rectangle(Point(0, 0), Point(2.2, 0.41))
-wedge = Ellipse(Point(0.3, 0.2), 0.1, 0.05)
+wedge = Polygon([Point(0.2, 0.2), Point(0.5, 0.15), Point(0.4, 0.2), Point(0.5, 0.25)])
 domain = channel - wedge
 mesh = generate_mesh(domain, 64)
 
@@ -21,7 +21,7 @@ Q = FunctionSpace(mesh, 'P', 1)
 inflow   = 'near(x[0], 0)'
 outflow  = 'near(x[0], 2.2)'
 walls    = 'near(x[1], 0) || near(x[1], 0.41)'
-wedge = 'on_boundary && x[0]>0.2 && x[0]<0.4 && x[1]>0.15 && x[1]<0.25'
+wedge = 'on_boundary && x[0]>0.2 && x[0]<0.5 && x[1]>0.15 && x[1]<0.25'
 
 # Define inflow profile
 inflow_profile = ('4.0*1.5*x[1]*(0.41 - x[1]) / pow(0.41, 2)', '0')
