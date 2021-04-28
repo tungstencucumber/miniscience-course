@@ -3,3 +3,4 @@
 miniscience/gmsh -- первая лаба по сеткам
 miniscience/vtk -- лаба по VTK со вращающейся деталькой
 miniscience/fenics -- лаба по FEniCS с обдуванием острого клина
+miniscience/phased-array -- микропроект по моделированию излучения фазированной антенной решётки
