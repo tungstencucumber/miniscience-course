@@ -1,5 +1,6 @@
 import pandas as pd
 from CalcMesh import *
+import time
 
 # Print iterations progress
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
