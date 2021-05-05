@@ -31,7 +31,7 @@ h = 0.001
 # Шаг по времени
 tau = 0.001
 # Количество шагов расчёта
-numberOfSteps = 100
+numberOfSteps = 200
 # Геометрический центр решётки
 center = np.array([0.03, 0.03])
 # Рабочая длина волны
@@ -41,19 +41,19 @@ speed = 0.5
 # Начальная амплитуда
 E0 = 1
 # Количество излучателей
-N = 11
+N = 101
 # Расстояние между излучателями
 distance = 0.003
 # Главное направление решётки
 thetaM = np.pi/4
 
 # Создаём сетку заданного размера
-MyArray = PhasedArray(center, thetaM, N, distance, E0, la, speed)
+MyArray = PhasedArray(center, thetaM, 3, distance, E0, la, speed)
 
 MyArray.LinearWave(np.pi/4)
 m = CalcMesh(size, h)
 # Пишем её начальное состояние в VTK
-m.Snapshot(0, "BeamWidthToAzimuth")
+m.Snapshot(0, "BeamWidthToEmitterNumber")
 
 printProgressBar(1, numberOfSteps, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
@@ -62,8 +62,9 @@ printProgressBar(1, numberOfSteps, prefix = 'Progress:', suffix = 'Complete', le
 
 for i in range(1, numberOfSteps):
     m.DoTimeStep(tau*i, MyArray.GetEmitters())
-    m.Snapshot(i, "BeamWidthToAzimuth")
+    m.Snapshot(i, "BeamWidthToEmitterNumber")
     if i >= int(0.2 * numberOfSteps) and i < int(0.8 * numberOfSteps):
+        MyArray = PhasedArray(center, thetaM, 3 + int((int(i - 0.2 * numberOfSteps))/(int(0.6*  numberOfSteps)) * (N - 3)), distance, E0, la, speed)
         MyArray.LinearWave(np.pi/4)
 
     printProgressBar(i + 1, numberOfSteps, prefix = 'Progress:', suffix = 'Complete', length = 50)
